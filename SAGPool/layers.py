@@ -1,6 +1,6 @@
 from torch_geometric.nn import GCNConv
-from torch_geometric.utils import filter_adj
-from torch_geomtric.nn import TopKPooling as topk
+from torch_geometric.utils.dropout import filter_adj
+from torch_geometric.nn import TopKPooling as topk
 from torch.nn import Parameter
 import torch.nn as nn
 import torch

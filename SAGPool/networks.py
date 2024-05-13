@@ -1,9 +1,9 @@
 import torch
 from torch_geometric.nn import GCNConv
-from torch_geometric.nn import GraphConv, TopKPooling
+#from torch_geometric.nn import GraphConv, TopKPooling
 from torch_geometric.nn import global_mean_pool as gap, global_max_pool as gmp
 import torch.nn.functional as F
-from layers import SAGPool, DualGCNConv
+from layers import SAGPool#, DualGCNConv
 
 
 
@@ -21,8 +21,8 @@ class Net(torch.nn.Module):
         
         self.conv1 = GCNConv(self.num_features, self.nhid)
         # Add DualConv Layer of Cycles
-        self.conv1_cycle_first = DualGCNConv(self.num_features, self.nhid)
-        self.conv1_cycle_last = DualGCNConv(self.nhid, self.nhid)
+        #self.conv1_cycle_first = DualGCNConv(self.num_features, self.nhid)
+        #self.conv1_cycle_last = DualGCNConv(self.nhid, self.nhid)
 
         self.pool1 = SAGPool(self.nhid, ratio=self.pooling_ratio)
         self.conv2 = GCNConv(self.nhid, self.nhid)
