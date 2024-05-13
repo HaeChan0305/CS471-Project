@@ -82,7 +82,7 @@ class DualGCN(nn.Module):
         h_c = self.proj2(h_c) 
         h_n = self.proj3(h_n)
         h_c = torch.matmul(g_ntoc, h_n)
-        h_orig = torch.matmul(g,)
+        #h_orig = torch.matmul(g,)
         h_n = torch.matmul(g_cton, h_c) # too much cycle influence, add original node influence 
         h[mask, :] = h_c
         h[~mask, :] = h_n
