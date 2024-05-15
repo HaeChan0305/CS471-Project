@@ -74,7 +74,6 @@ def add_cycle_nodes(dataset):
     return dataset
 
 
-## Memory Inefficient Version
 class CycleProcessor():
     def __init__(self):
         pass
@@ -107,7 +106,6 @@ class CycleProcessor():
         h_cyc[:h.size(0), :] = h
         return h_cyc
 
-    ## Memory Efficient Version
     def cycle_proc(self, h, g, start_index): 
         """
         g: adj matrix with 2 x edge torch tensor (value: 0 or 1)
@@ -167,21 +165,3 @@ class CycleProcessor():
     def __call__(self, x, edge_index, batch):
         h_cyc, g_cyc, batch = self.cycle_proc_batch(x, edge_index, batch)
         return h_cyc, g_cyc, batch
-
-    # if __name__ == '__main__':
-    #     adj = torch.tensor([[0, 1, 1, 1],
-    #                         [1, 0, 1, 0],
-    #                         [1, 1, 0, 0],
-    #                         [1, 0, 0, 0]])
-    #     h = torch.tensor([[1, 1],
-    #                     [2, 2],
-    #                     [3, 3],
-    #                     [4, 4]])
-    #     g_cyc = cycle_adj(adj)
-    #     h_cyc = initialize_cycle(g_cyc, h)
-    #     print(g_cyc, h_cyc)
-
-    #     g = torch.tensor([[0, 1],[1, 0],[0,2],[2,0],[0,3],[3,0],[1,2],[2,1]]).T
-    #     print(g.shape)
-    #     g_cyc, h_cyc = cycle_proc(g, h)
-    #     print(g_cyc, h_cyc)
