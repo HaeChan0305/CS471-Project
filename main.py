@@ -78,7 +78,7 @@ def test(model,loader):
 
 # Find the next log file index
 def get_next_log_index():
-    log_files = [f for f in os.listdir('./logs') if re.match(r'log_\d+\.txt', f)]
+    log_files = [f for f in os.listdir('./logs/ablation_{ablation}') if re.match(r'log_\d+\.txt', f)]
     if not log_files:
         return 1
     max_index = max(int(re.search(r'\d+', f).group()) for f in log_files)
