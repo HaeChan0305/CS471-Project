@@ -9,7 +9,7 @@ import networkx as nx
 import torch_geometric.utils as pyg_utils
 from torch_geometric.data import Data
 
-def add_cycle_nodes(dataset):
+def add_cycle_nodes(dataset, ablation):
     # slices
     x_slices = dataset.slices['x']
     edge_index_slices = dataset.slices['edge_index']
@@ -37,7 +37,8 @@ def add_cycle_nodes(dataset):
         new_edge_index_in_graph = edge_index[:, edge_index_slices[graph_idx]:edge_index_slices[graph_idx + 1]]
 
         G = pyg_utils.to_networkx(Data(x=new_x_in_graph, edge_index=new_edge_index_in_graph), to_undirected=True)  # Modified
-        cycles = list(nx.cycle_basis(G))  # Modified
+        if ablation != 1:
+            cycles = list(nx.cycle_basis(G))  # Modified
 
         # add cycles to x as nodes
         for cycle in cycles:

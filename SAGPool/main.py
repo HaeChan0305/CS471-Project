@@ -34,15 +34,17 @@ parser.add_argument('--patience', type=int, default=50,
                     help='patience for earlystopping')
 parser.add_argument('--pooling_layer_type', type=str, default='GCNConv',
                     help='DD/PROTEINS/NCI1/NCI109/Mutagenicity')
+parser.add_argument('--ablation', type=int, default=0)
 
 args = parser.parse_args()
+ablation = args.ablation
 args.device = 'cpu'
 torch.manual_seed(args.seed)
 if torch.cuda.is_available():
     torch.cuda.manual_seed(args.seed)
     args.device = 'cuda:0'
 dataset = TUDataset(os.path.join('data',args.dataset),name=args.dataset)
-dataset = add_cycle_nodes(dataset) # added
+dataset = add_cycle_nodes(dataset, ablation) # added
 
 args.num_classes = dataset.num_classes
 args.num_features = dataset.num_features
