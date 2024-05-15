@@ -2,7 +2,7 @@ import torch
 from torch_geometric.datasets import TUDataset
 from torch_geometric.data import DataLoader
 from torch_geometric import utils
-from networks import  Net
+from networks import Net
 import torch.nn.functional as F
 import argparse
 import os
@@ -23,7 +23,7 @@ parser.add_argument('--pooling_ratio', type=float, default=0.5,
                     help='pooling ratio')
 parser.add_argument('--dropout_ratio', type=float, default=0.5,
                     help='dropout ratio')
-parser.add_argument('--dataset', type=str, default='DD',
+parser.add_argument('--dataset', type=str, default='NCI1',
                     help='DD/PROTEINS/NCI1/NCI109/Mutagenicity')
 parser.add_argument('--epochs', type=int, default=100000,
                     help='maximum number of epochs')
