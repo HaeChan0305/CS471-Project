@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import networkx as nx
 from utils.ops import GCN, GraphUnet, Initializer, norm_g, DualGCN
+from utils.ops1 import GraphAttentionLayer as GAT
 
 
 class GNet(nn.Module):
@@ -10,9 +11,12 @@ class GNet(nn.Module):
         super(GNet, self).__init__()
         self.n_act = getattr(nn, args.act_n)()
         self.c_act = getattr(nn, args.act_c)()
-        self.s_gcn = GCN(in_dim, args.l_dim, self.n_act, args.drop_n)
-        self.s_cyclegcn_first = GCN(in_dim, args.l_dim, self.n_act, args.drop_n)
-        self.s_cyclegcn_last = DualGCN(args.l_dim, args.l_dim, self.n_act, args.drop_n)
+        #self.s_gcn = GCN(in_dim, args.l_dim, self.n_act, args.drop_n)
+        #self.s_cyclegcn_first = GCN(in_dim, args.l_dim, self.n_act, args.drop_n)
+        #self.s_cyclegcn_last = DualGCN(args.l_dim, args.l_dim, self.n_act, args.drop_n)
+        self.s_gat = GAT(in_dim, args.l_dim, n_heads=4, dropout = args.drop_n)
+        self.g_s_cycle = GAT(in_dim, args.l_dim, n_heads=4, dropout = args.drop_n)
+        self.s_comb = GAT(args.l_dim, args.l_dim, n_heads=4, dropout = args.drop_n)
         self.g_unet = GraphUnet(
             args.ks, args.l_dim, args.l_dim, args.l_dim, self.n_act,
             args.drop_n)
@@ -52,17 +56,20 @@ class GNet(nn.Module):
             for j in range(len(cycle)):
                 g_cyc[g.size(0)+i, cycle[j]] = 1 # creating coboundary matrix (0,1,3,4) <-> [1 1 0 1 1 0 ...] row vec
                 g_cyc[cycle[j], g.size(0)+i] = 1 # creating boundary matrix (0,1,3,4) <-> [1;1;0;1;1;0;...] col vec
-        mask = [False] * g.size(0) + [True] * len(cyc)
-        mask = torch.tensor(mask, dtype = torch.bool, device = g.device)
+        #mask = [False] * g.size(0) + [True] * len(cyc)
+        #mask = torch.tensor(mask, dtype = torch.bool, device = g.device)
         
         # initialize cycle embedding to zeros
         h_cyc = torch.zeros((g.size(0)+len(cyc), h.size(1)), device = h.device)
         h_cyc[:g.size(0), :] = h
         h_cyc[g.size(0):, :] = torch.zeros(len(cyc), h.size(1))
 
-        # cycle gcn
-        h_cyc = self.s_cyclegcn_first(g_cyc, h_cyc) # just for initialization of h_cyc
-        h_cyc = self.s_cyclegcn_last(g_cyc, h_cyc, mask)
+        # cycle gcn: Layer1: alpha * Original GAT + (1-alpha) * Node+Cycle GAT. Layer2: GAT
+        alpha = 0.9
+        h_cyc = self.g_s_cycle(g_cyc, h_cyc) # just for initialization of h_cyc
+        h_c = self.s_gcn(g, h)
+        h_cyc[:g.size(0), :] = alpha * h_c + (1-alpha) * h_cyc
+        h_cyc = self.s_comb(g_cyc, h_cyc)
             
         # prun cycle nodes before going into gcn
         h_c = h_cyc[:g.size(0), :]
