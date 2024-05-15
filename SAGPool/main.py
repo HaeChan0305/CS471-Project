@@ -5,9 +5,10 @@ from torch_geometric import utils
 from networks import Net
 import torch.nn.functional as F
 import argparse
-import os
 from torch.utils.data import random_split
 from cycle import add_cycle_nodes
+import os
+import re
 
 parser = argparse.ArgumentParser()
 
@@ -73,6 +74,25 @@ def test(model,loader):
     return correct / len(loader.dataset),loss / len(loader.dataset)
 
 
+# Find the next log file index
+def get_next_log_index():
+    log_files = [f for f in os.listdir('./logs') if re.match(r'log_\d+\.txt', f)]
+    if not log_files:
+        return 1
+    max_index = max(int(re.search(r'\d+', f).group()) for f in log_files)
+    return max_index + 1
+
+log_index = get_next_log_index()
+log_filename = f'./logs/log_{log_index}.txt'
+
+# Logging function
+def log(message):
+    with open(log_filename, 'a') as f:
+        f.write(message + '\n')
+
+# Log training configuration
+log(f'Training configuration: {args}')
+
 min_loss = 1e10
 patience = 0
 
@@ -87,9 +107,11 @@ for epoch in range(args.epochs):
         optimizer.step()
         optimizer.zero_grad()
     val_acc,val_loss = test(model,val_loader)
-    print("Validation loss:{}\taccuracy:{}".format(val_loss,val_acc))
+    log(f'Epoch {epoch}: Validation loss: {val_loss}\taccuracy: {val_acc}')
+    print(f'Epoch {epoch}: Validation loss: {val_loss}\taccuracy: {val_acc}')
     if val_loss < min_loss:
         torch.save(model.state_dict(),'latest.pth')
+        log(f'Model saved at epoch {epoch}')
         print("Model saved at epoch{}".format(epoch))
         min_loss = val_loss
         patience = 0
@@ -101,4 +123,5 @@ for epoch in range(args.epochs):
 model = Net(args).to(args.device)
 model.load_state_dict(torch.load('latest.pth'))
 test_acc,test_loss = test(model,test_loader)
-print("Test accuarcy:{}".format(test_acc))
+log(f'Test accuracy: {test_acc}')
+print(f'Test accuracy: {test_acc}')
