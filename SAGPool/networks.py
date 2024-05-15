@@ -36,10 +36,10 @@ class Net(torch.nn.Module):
         self.lin3 = torch.nn.Linear(self.nhid//2, self. num_classes)
 
     def forward(self, data):
-        # x, edge_index, batch = data.x, data.edge_index, data.batch
+        x, edge_index, batch = data.x, data.edge_index, data.batch
         # print("x: ", x.shape, edge_index.shape, batch.shape)
         
-        x, edge_index, batch = self.cycle_processor(data.x, data.edge_index, data.batch)
+        # x, edge_index, batch = self.cycle_processor(data.x, data.edge_index, data.batch)
         # print("x: ", x.shape, edge_index.shape, batch.shape)
         
         x = F.relu(self.conv1(x, edge_index))
