@@ -21,9 +21,6 @@ class Net(torch.nn.Module):
         self.cycle_processor = CycleProcessor()
         
         self.conv1 = GCNConv(self.num_features, self.nhid)
-        # Add DualConv Layer of Cycles
-        #self.conv1_cycle_first = DualGCNConv(self.num_features, self.nhid)
-        #self.conv1_cycle_last = DualGCNConv(self.nhid, self.nhid)
 
         self.pool1 = SAGPool(self.nhid, ratio=self.pooling_ratio)
         self.conv2 = GCNConv(self.nhid, self.nhid)
@@ -36,23 +33,42 @@ class Net(torch.nn.Module):
         self.lin3 = torch.nn.Linear(self.nhid//2, self. num_classes)
 
     def forward(self, data):
-        # x, edge_index, batch = data.x, data.edge_index, data.batch
-        # print("x: ", x.shape, edge_index.shape, batch.shape)
-        
-        x, edge_index, batch = self.cycle_processor(data.x, data.edge_index, data.batch)
-        # print("x: ", x.shape, edge_index.shape, batch.shape)
-        
+        x_node, edge_index_node, batch_node = data.x, data.edge_index, data.batch
+        # cycle_start_idx = len(data.x)
+        # print(cycle_start_idx)
+        x, edge_index, batch = self.cycle_processor(x_node, edge_index_node, batch_node)
+
         x = F.relu(self.conv1(x, edge_index))
-        x, edge_index, _, batch, _ = self.pool1(x, edge_index, None, batch)
+        x, edge_index, _, batch, perm = self.pool1(x, edge_index, None, batch)        
         x1 = torch.cat([gmp(x, batch), gap(x, batch)], dim=1)
+        
+        # Seperate node part and cycle part
+        # is_node = perm < cycle_start_idx
+        # is_cycle = ~ is_node
+        # x_node = x[is_node]
+        # x_cycle = x[is_cycle]
+        
+        # batch_node = batch[is_node]
+        # batch_cycle = batch[is_cycle]
+        
+        # edge_index_node = []
+        # edge_index_cycle = []
+        # for edge in edge_index.T:
+        #     if is_node[edge[0]] and is_node[edge[1]]:
+        #         edge_index_node.append(edge.unsqueeze(0))
+        #     else:
+        #         edge_index_cycle.append(edge.unsqueeze(0))
+        # edge_index_node = torch.cat(edge_index_node, dim=0).T
+        # edge_index_cycle = torch.cat(edge_index_cycle, dim=0).T
 
-        x = F.relu(self.conv2(x, edge_index))
-        x, edge_index, _, batch, _ = self.pool2(x, edge_index, None, batch)
-        x2 = torch.cat([gmp(x, batch), gap(x, batch)], dim=1)
+        
+        x_node = F.relu(self.conv2(x_node, edge_index_node))
+        x_node, edge_index_node, _, batch_node, _ = self.pool2(x_node, edge_index_node, None, batch_node)
+        x2 = torch.cat([gmp(x_node, batch_node), gap(x_node, batch_node)], dim=1)
 
-        x = F.relu(self.conv3(x, edge_index))
-        x, edge_index, _, batch, _ = self.pool3(x, edge_index, None, batch)
-        x3 = torch.cat([gmp(x, batch), gap(x, batch)], dim=1)
+        x_node = F.relu(self.conv3(x_node, edge_index_node))
+        x_node, edge_index_node, _, batch_node, _ = self.pool3(x_node, edge_index_node, None, batch_node)
+        x3 = torch.cat([gmp(x_node, batch_node), gap(x_node, batch_node)], dim=1)
 
         x = x1 + x2 + x3
 
