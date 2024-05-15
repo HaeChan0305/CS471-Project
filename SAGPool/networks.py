@@ -4,7 +4,7 @@ from torch_geometric.nn import GCNConv
 from torch_geometric.nn import global_mean_pool as gap, global_max_pool as gmp
 import torch.nn.functional as F
 from layers import SAGPool#, DualGCNConv
-
+from cycle import CycleProcessor
 
 
 
@@ -18,6 +18,7 @@ class Net(torch.nn.Module):
         self.num_classes = args.num_classes
         self.pooling_ratio = args.pooling_ratio
         self.dropout_ratio = args.dropout_ratio
+        self.cycle_processor = CycleProcessor()
         
         self.conv1 = GCNConv(self.num_features, self.nhid)
         # Add DualConv Layer of Cycles
@@ -35,11 +36,12 @@ class Net(torch.nn.Module):
         self.lin3 = torch.nn.Linear(self.nhid//2, self. num_classes)
 
     def forward(self, data):
-        x, edge_index, batch = data.x, data.edge_index, data.batch
+        # x, edge_index, batch = data.x, data.edge_index, data.batch
+        # print("x: ", x.shape, edge_index.shape, batch.shape)
         
-        # Additional Cyclic Message Passing Layer
-        print("x: ", x.shape, edge_index.shape, batch.shape)
-
+        x, edge_index, batch = self.cycle_processor(data.x, data.edge_index, data.batch)
+        # print("x: ", x.shape, edge_index.shape, batch.shape)
+        
         x = F.relu(self.conv1(x, edge_index))
         x, edge_index, _, batch, _ = self.pool1(x, edge_index, None, batch)
         x1 = torch.cat([gmp(x, batch), gap(x, batch)], dim=1)
