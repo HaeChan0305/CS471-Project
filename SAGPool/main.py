@@ -113,7 +113,6 @@ for epoch in range(args.epochs):
     print(f'Epoch {epoch}: Validation loss: {val_loss}\taccuracy: {val_acc}')
     if val_loss < min_loss:
         torch.save(model.state_dict(),'latest.pth')
-        log(f'Model saved at epoch {epoch}')
         print("Model saved at epoch{}".format(epoch))
         min_loss = val_loss
         patience = 0
