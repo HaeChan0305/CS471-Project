@@ -21,13 +21,14 @@ def add_cycle_nodes(dataset):
     original_device = x.device
 
     # nodes have one more feature
-    x = torch.cat([x, torch.zeros(x.size(0), 1, device=original_device)], dim=1)  # One more feature
+    max_cycles = 3
+    x = torch.cat([x, torch.zeros(x.size(0), max_cycles + 1, device=original_device)], dim=1)  # max_cycles more feature
     feature_size = x.size(1)
 
     # for dataset to return
-    new_x = torch.tensor([], dtype=x.dtype, device=x.device).view(0, x.size(1))
+    new_x = torch.tensor([], dtype=x.dtype, device=x.device).view(0, x.size(1)) # Modified <- max_cycles more feature
     new_edge_index = torch.tensor([], dtype=edge_index.dtype, device=edge_index.device).view(2, 0)
-    new_x_slices = [0]
+    new_x_slices = [0] 
     new_edge_index_slices = [0]
 
     for graph_idx in range(graph_num):
@@ -40,13 +41,18 @@ def add_cycle_nodes(dataset):
         cycles = list(nx.cycle_basis(G))  # Modified
 
         # add cycles to x as nodes
+        cycle_group = -1
         for cycle in cycles:
+            cycle_group += 1
             cycle_size = len(cycle)
+
+            # change additional features in x - mod one hot vector of cycles
+            new_x_in_graph[:,-1-(cycle_group % max_cycles)] = 1
 
             # add cycle node
             cycle_node_feature = new_x_in_graph[cycle]
-            cycle_node_feature = cycle_node_feature.mean(dim=0)
-            cycle_node_feature[-1] = float(cycle_size)
+            cycle_node_feature = cycle_node_feature.mean(dim=0) # cycle gets its one-hot id
+            cycle_node_feature[-1-max_cycles] = float(cycle_size) # Additional feature for cycle size
 
             # update x, batch
             new_x_in_graph = torch.cat([new_x_in_graph, cycle_node_feature.view(1, feature_size)], dim=0)

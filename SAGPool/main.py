@@ -7,8 +7,6 @@ import torch.nn.functional as F
 import argparse
 import os
 from torch.utils.data import random_split
-from cycle import add_cycle_nodes
-
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--seed', type=int, default=777,
@@ -37,12 +35,13 @@ parser.add_argument('--pooling_layer_type', type=str, default='GCNConv',
 args = parser.parse_args()
 args.device = 'cpu'
 torch.manual_seed(args.seed)
-if torch.cuda.is_available():
-    torch.cuda.manual_seed(args.seed)
-    args.device = 'cuda:0'
+#if torch.cuda.is_available():
+#    torch.cuda.manual_seed(args.seed)
+#    args.device = 'cuda:0'
+#dataset = TUDataset(os.path.join('data',args.dataset),name=args.dataset)
+from cycle import add_cycle_nodes # added
 dataset = TUDataset(os.path.join('data',args.dataset),name=args.dataset)
-dataset = add_cycle_nodes(dataset) # added
-
+#dataset = add_cycle_nodes(dataset) # added
 args.num_classes = dataset.num_classes
 args.num_features = dataset.num_features
 
@@ -77,6 +76,7 @@ min_loss = 1e10
 patience = 0
 
 for epoch in range(args.epochs):
+    print("Epoch: ", epoch)
     model.train()
     for i, data in enumerate(train_loader):
         data = data.to(args.device)
