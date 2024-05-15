@@ -4,6 +4,76 @@ import torch.nn as nn
 import torch.nn.functional as F
 import networkx as nx
 
+import torch
+import networkx as nx
+import torch_geometric.utils as pyg_utils
+from torch_geometric.data import Data
+
+def add_cycle_nodes(dataset):
+    # slices
+    x_slices = dataset.slices['x']
+    edge_index_slices = dataset.slices['edge_index']
+    y_slices = dataset.slices['y']
+    graph_num = y_slices.size(0) - 1
+
+    # data
+    x, edge_index = dataset._data.x, dataset._data.edge_index
+    original_device = x.device
+
+    # nodes have one more feature
+    x = torch.cat([x, torch.zeros(x.size(0), 1, device=original_device)], dim=1)  # One more feature
+    feature_size = x.size(1)
+
+    # for dataset to return
+    new_x = torch.tensor([], dtype=x.dtype, device=x.device).view(0, x.size(1))
+    new_edge_index = torch.tensor([], dtype=edge_index.dtype, device=edge_index.device).view(2, 0)
+    new_x_slices = [0]
+    new_edge_index_slices = [0]
+
+    for graph_idx in range(graph_num):
+        num_nodes = x_slices[graph_idx + 1] - x_slices[graph_idx]
+
+        new_x_in_graph = x[x_slices[graph_idx]:x_slices[graph_idx + 1]]
+        new_edge_index_in_graph = edge_index[:, edge_index_slices[graph_idx]:edge_index_slices[graph_idx + 1]]
+
+        G = pyg_utils.to_networkx(Data(x=new_x_in_graph, edge_index=new_edge_index_in_graph), to_undirected=True)  # Modified
+        cycles = list(nx.cycle_basis(G))  # Modified
+
+        # add cycles to x as nodes
+        for cycle in cycles:
+            cycle_size = len(cycle)
+
+            # add cycle node
+            cycle_node_feature = new_x_in_graph[cycle]
+            cycle_node_feature = cycle_node_feature.mean(dim=0)
+            cycle_node_feature[-1] = float(cycle_size)
+
+            # update x, batch
+            new_x_in_graph = torch.cat([new_x_in_graph, cycle_node_feature.view(1, feature_size)], dim=0)
+
+            # connect the cycle to nodes (update edge_index)
+            for cycle_node_idx in range(cycle_size):
+                x_idx = cycle[cycle_node_idx]
+                new_node_idx = new_x_in_graph.size(0) - 1  # Modified
+                x_edge = torch.tensor([[x_idx, new_node_idx]], dtype=torch.long, device=original_device)  # Modified
+                x_edge = x_edge.view(2, 1)
+                new_edge_index_in_graph = torch.cat([new_edge_index_in_graph, x_edge], dim=1)
+                x_edge = x_edge.flip(0)
+                new_edge_index_in_graph = torch.cat([new_edge_index_in_graph, x_edge], dim=1)
+
+        new_x = torch.cat([new_x, new_x_in_graph], dim=0)
+        new_edge_index = torch.cat([new_edge_index, new_edge_index_in_graph], dim=1)
+        new_x_slices.append(new_x.size(0))
+        new_edge_index_slices.append(new_edge_index.size(1))
+
+    dataset._data.x = new_x
+    dataset._data.edge_index = new_edge_index
+    dataset.slices['x'] = torch.tensor(new_x_slices, dtype=torch.long, device=original_device)
+    dataset.slices['edge_index'] = torch.tensor(new_edge_index_slices, dtype=torch.long, device=original_device)
+
+    return dataset
+
+
 ## Memory Inefficient Version
 class CycleProcessor():
     def __init__(self):

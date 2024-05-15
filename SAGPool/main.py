@@ -7,6 +7,8 @@ import torch.nn.functional as F
 import argparse
 import os
 from torch.utils.data import random_split
+from cycle import add_cycle_nodes
+
 parser = argparse.ArgumentParser()
 
 parser.add_argument('--seed', type=int, default=777,
@@ -39,6 +41,8 @@ if torch.cuda.is_available():
     torch.cuda.manual_seed(args.seed)
     args.device = 'cuda:0'
 dataset = TUDataset(os.path.join('data',args.dataset),name=args.dataset)
+dataset = add_cycle_nodes(dataset) # added
+
 args.num_classes = dataset.num_classes
 args.num_features = dataset.num_features
 
