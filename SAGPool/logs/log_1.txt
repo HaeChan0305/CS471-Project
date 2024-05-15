@@ -1,0 +1,19 @@
+Training configuration: Namespace(seed=777, batch_size=128, lr=0.0005, weight_decay=0.0001, nhid=128, pooling_ratio=0.5, dropout_ratio=0.5, dataset='NCI1', epochs=100000, patience=50, pooling_layer_type='GCNConv', ablation=0, device='cuda:0', num_classes=2, num_features=38)
+Epoch 0: Validation loss: 0.6854138153892944	accuracy: 0.5328467153284672
+Epoch 1: Validation loss: 0.6648849292393149	accuracy: 0.6082725060827251
+Epoch 2: Validation loss: 0.6537355576118413	accuracy: 0.681265206812652
+Epoch 3: Validation loss: 0.6424671739267317	accuracy: 0.6763990267639902
+Epoch 4: Validation loss: 0.6410686465075416	accuracy: 0.6374695863746959
+Epoch 5: Validation loss: 0.6383175838312674	accuracy: 0.6447688564476886
+Epoch 6: Validation loss: 0.6295838065971133	accuracy: 0.6520681265206812
+Epoch 7: Validation loss: 0.623619534383435	accuracy: 0.683698296836983
+Epoch 8: Validation loss: 0.6211273281533642	accuracy: 0.6763990267639902
+Epoch 9: Validation loss: 0.6215144224700556	accuracy: 0.6618004866180048
+Epoch 10: Validation loss: 0.6192817664784527	accuracy: 0.6715328467153284
+Epoch 11: Validation loss: 0.6216671542239596	accuracy: 0.6642335766423357
+Epoch 12: Validation loss: 0.6399056139943663	accuracy: 0.6180048661800487
+Epoch 13: Validation loss: 0.6229497394422545	accuracy: 0.6399026763990268
+Epoch 14: Validation loss: 0.6151813242557275	accuracy: 0.6472019464720195
+Epoch 15: Validation loss: 0.6186998650395377	accuracy: 0.635036496350365
+Epoch 16: Validation loss: 0.6172721426562381	accuracy: 0.6593673965936739
+Epoch 17: Validation loss: 0.6065534582393303	accuracy: 0.6642335766423357

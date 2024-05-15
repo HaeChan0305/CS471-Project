@@ -6,8 +6,9 @@
 # python3 main.py --ablation 0
 # python3 main.py --ablation 1
 
-for i in {0..1}
-    for j in {1..30}
+for i in $(seq 0 1)
+do
+    for j in $(seq 1 30)
     do
         python3 main.py --ablation $i
     done
