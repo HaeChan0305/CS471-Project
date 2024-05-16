@@ -46,7 +46,10 @@ def add_cycle_nodes(dataset, ablation):
             # add cycle node
             cycle_node_feature = new_x_in_graph[cycle]
             cycle_node_feature = cycle_node_feature.mean(dim=0)
-            cycle_node_feature[-1] = float(cycle_size)
+            if ablation != 1:
+                cycle_node_feature[-1] = float(cycle_size)
+            else:
+                cycle_node_feature[-1] = float(0)
 
             # update x, batch
             new_x_in_graph = torch.cat([new_x_in_graph, cycle_node_feature.view(1, feature_size)], dim=0)
