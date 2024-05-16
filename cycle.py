@@ -37,8 +37,7 @@ def add_cycle_nodes(dataset, ablation):
         new_edge_index_in_graph = edge_index[:, edge_index_slices[graph_idx]:edge_index_slices[graph_idx + 1]]
 
         G = pyg_utils.to_networkx(Data(x=new_x_in_graph, edge_index=new_edge_index_in_graph), to_undirected=True)  # Modified
-        if ablation != 1:
-            cycles = list(nx.cycle_basis(G))  # Modified
+        cycles = list(nx.cycle_basis(G))  # Modified
 
         # add cycles to x as nodes
         for cycle in cycles:
