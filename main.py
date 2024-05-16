@@ -78,14 +78,14 @@ def test(model,loader):
 
 # Find the next log file index
 def get_next_log_index():
-    log_files = [f for f in os.listdir(f'./logs/ablation_{ablation}') if re.match(r'log_\d+\.txt', f)]
+    log_files = [f for f in os.listdir(f'./logs/{args.dataset}/ablation_{ablation}') if re.match(r'log_\d+\.txt', f)]
     if not log_files:
         return 1
     max_index = max(int(re.search(r'\d+', f).group()) for f in log_files)
-    return max_index + 1
+    return max_index + 1 
 
 log_index = get_next_log_index()
-log_filename = f'./logs/ablation_{ablation}/log_{log_index}.txt'
+log_filename = f'./logs/{args.dataset}/ablation_{ablation}/log_{log_index}.txt'
 
 # Logging function
 def log(message):
