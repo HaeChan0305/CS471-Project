@@ -78,6 +78,9 @@ def test(model,loader):
 
 # Find the next log file index
 def get_next_log_index():
+    # if folder doesn't exist, make one
+    if not os.path.exists(f'./logs/{args.dataset}/ablation_{ablation}'):
+        os.makedirs(f'./logs/{args.dataset}/ablation_{ablation}')
     log_files = [f for f in os.listdir(f'./logs/{args.dataset}/ablation_{ablation}') if re.match(r'log_\d+\.txt', f)]
     if not log_files:
         return 1
