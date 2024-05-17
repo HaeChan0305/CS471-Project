@@ -28,7 +28,7 @@ def check_validity(file):
 
 
 if __name__ == "__main__":
-    for dataset in ["NCI1", "PROTEINS"]:
+    for dataset in ["PROTEINS", "NCI1"]:
         for ablation in range(4):
             dir = f'./logs/{dataset}/ablation_{ablation}'
             # if args.validation:
