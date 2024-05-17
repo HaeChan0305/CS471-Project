@@ -6,10 +6,10 @@
 # python3 main.py --ablation 0
 # python3 main.py --ablation 1
 
-for i in $(seq 0 1)
+# for i in $(seq 0 1)
+# do
+for j in $(seq 1 30)
 do
-    for j in $(seq 1 30)
-    do
-        python3 main.py --ablation $i
-    done
+    python main.py --file logs_exp2_PROTEINS --iter $j --dataset PROTEINS
 done
+# done

@@ -9,7 +9,7 @@ import networkx as nx
 import torch_geometric.utils as pyg_utils
 from torch_geometric.data import Data
 
-def add_cycle_nodes(dataset, ablation):
+def add_cycle_nodes(dataset):
     # slices
     x_slices = dataset.slices['x']
     edge_index_slices = dataset.slices['edge_index']
@@ -21,7 +21,7 @@ def add_cycle_nodes(dataset, ablation):
     original_device = x.device
 
     # nodes have one more feature
-    x = torch.cat([x, torch.zeros(x.size(0), 1, device=original_device)], dim=1)  # One more feature
+    # x = torch.cat([x, torch.zeros(x.size(0), 1, device=original_device)], dim=1)  # One more feature
     feature_size = x.size(1)
 
     # for dataset to return
@@ -37,8 +37,7 @@ def add_cycle_nodes(dataset, ablation):
         new_edge_index_in_graph = edge_index[:, edge_index_slices[graph_idx]:edge_index_slices[graph_idx + 1]]
 
         G = pyg_utils.to_networkx(Data(x=new_x_in_graph, edge_index=new_edge_index_in_graph), to_undirected=True)  # Modified
-        if ablation != 1:
-            cycles = list(nx.cycle_basis(G))  # Modified
+        cycles = list(nx.cycle_basis(G))  # Modified
 
         # add cycles to x as nodes
         for cycle in cycles:
@@ -47,7 +46,7 @@ def add_cycle_nodes(dataset, ablation):
             # add cycle node
             cycle_node_feature = new_x_in_graph[cycle]
             cycle_node_feature = cycle_node_feature.mean(dim=0)
-            cycle_node_feature[-1] = float(cycle_size)
+            # cycle_node_feature[-1] = float(cycle_size)
 
             # update x, batch
             new_x_in_graph = torch.cat([new_x_in_graph, cycle_node_feature.view(1, feature_size)], dim=0)

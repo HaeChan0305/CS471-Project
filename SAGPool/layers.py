@@ -15,7 +15,7 @@ class SAGPool(torch.nn.Module):
     def forward(self, x, edge_index, edge_attr=None, batch=None):
         if batch is None:
             batch = edge_index.new_zeros(x.size(0))
-        #x = x.unsqueeze(-1) if x.dim() == 1 else x
+        # x = x.unsqueeze(-1) if x.dim() == 1 else x
         score = self.score_layer(x,edge_index).squeeze()
         x, edge_index, edge_attr, batch, perm, score = self.pooling(x, edge_index, edge_attr, batch, attn=score)
 

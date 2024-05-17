@@ -1,3 +1,4 @@
+import random
 import torch
 from torch_geometric.datasets import TUDataset
 from torch_geometric.data import DataLoader
@@ -34,17 +35,20 @@ parser.add_argument('--patience', type=int, default=50,
                     help='patience for earlystopping')
 parser.add_argument('--pooling_layer_type', type=str, default='GCNConv',
                     help='DD/PROTEINS/NCI1/NCI109/Mutagenicity')
-parser.add_argument('--ablation', type=int, default=0)
+parser.add_argument('--iter', type=int)
+parser.add_argument('--file', type=str)
 
 args = parser.parse_args()
-ablation = args.ablation
+# ablation = args.ablation
 args.device = 'cpu'
+args.seed = random.randint(0, 1000)
+
 torch.manual_seed(args.seed)
 if torch.cuda.is_available():
     torch.cuda.manual_seed(args.seed)
     args.device = 'cuda:0'
 dataset = TUDataset(os.path.join('data',args.dataset),name=args.dataset)
-dataset = add_cycle_nodes(dataset, ablation) # added
+dataset = add_cycle_nodes(dataset) # added
 
 args.num_classes = dataset.num_classes
 args.num_features = dataset.num_features
@@ -77,15 +81,15 @@ def test(model,loader):
 
 
 # Find the next log file index
-def get_next_log_index():
-    log_files = [f for f in os.listdir('./logs') if re.match(r'log_\d+\.txt', f)]
-    if not log_files:
-        return 1
-    max_index = max(int(re.search(r'\d+', f).group()) for f in log_files)
-    return max_index + 1
+# def get_next_log_index():
+#     log_files = [f for f in os.listdir('./logs_exp2') if re.match(r'log_\d+\.txt', f)]
+#     if not log_files:
+#         return 1
+#     max_index = max(int(re.search(r'\d+', f).group()) for f in log_files)
+#     return max_index + 1
 
-log_index = get_next_log_index()
-log_filename = f'./logs/log_{log_index}.txt'
+# log_index = get_next_log_index()
+log_filename = f'./{args.file}/log_{args.iter}.txt'
 
 # Logging function
 def log(message):
