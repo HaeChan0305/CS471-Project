@@ -8,8 +8,8 @@
 
 # for i in $(seq 0 1)
 # do
-for j in $(seq 11 11)
+for j in $(seq 100 102)
 do
-    python main.py --file logs_ablation2_NCI1 --iter $j
+    python main.py --file logs_ablation3_NCI1 --iter $j
 done
 # done
