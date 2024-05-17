@@ -48,7 +48,7 @@ if torch.cuda.is_available():
     torch.cuda.manual_seed(args.seed)
     args.device = 'cuda:0'
 dataset = TUDataset(os.path.join('data',args.dataset),name=args.dataset)
-dataset = add_cycle_nodes(dataset) # added
+# dataset = add_cycle_nodes(dataset) # added
 
 args.num_classes = dataset.num_classes
 args.num_features = dataset.num_features
@@ -62,7 +62,7 @@ training_set,validation_set,test_set = random_split(dataset,[num_training,num_va
 
 train_loader = DataLoader(training_set, batch_size=args.batch_size, shuffle=True)
 val_loader = DataLoader(validation_set,batch_size=args.batch_size,shuffle=False)
-test_loader = DataLoader(test_set,batch_size=1,shuffle=False)
+test_loader = DataLoader(test_set,batch_size=2,shuffle=False)
 model = Net(args).to(args.device)
 optimizer = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 

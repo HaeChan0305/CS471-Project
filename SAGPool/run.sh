@@ -8,8 +8,8 @@
 
 # for i in $(seq 0 1)
 # do
-for j in $(seq 1 30)
+for j in $(seq 11 11)
 do
-    python main.py --file logs_exp2_PROTEINS --iter $j --dataset PROTEINS
+    python main.py --file logs_ablation2_NCI1 --iter $j
 done
 # done
