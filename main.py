@@ -1,4 +1,5 @@
 import torch
+import random
 from torch_geometric.datasets import TUDataset
 from torch_geometric.data import DataLoader
 from torch_geometric import utils
@@ -38,11 +39,17 @@ parser.add_argument('--ablation', type=int, default=0)
 
 args = parser.parse_args()
 ablation = args.ablation
+
+# device
 args.device = 'cpu'
-torch.manual_seed(args.seed)
 if torch.cuda.is_available():
     torch.cuda.manual_seed(args.seed)
     args.device = 'cuda:0'
+
+# random seed
+args.seed = random.randint(0, 1000)
+torch.manual_seed(args.seed)
+
 dataset = TUDataset(os.path.join('data',args.dataset),name=args.dataset)
 if ablation != 2:
     dataset = add_cycle_nodes(dataset, ablation) # added

@@ -21,8 +21,9 @@ def add_cycle_nodes(dataset, ablation):
     original_device = x.device
 
     # nodes have one more feature
-    x = torch.cat([x, torch.zeros(x.size(0), 1, device=original_device)], dim=1)  # One more feature
-    feature_size = x.size(1)
+    if ablation != 3:
+        x = torch.cat([x, torch.zeros(x.size(0), 1, device=original_device)], dim=1)  # One more feature
+        feature_size = x.size(1)
 
     # for dataset to return
     new_x = torch.tensor([], dtype=x.dtype, device=x.device).view(0, x.size(1))
@@ -46,10 +47,19 @@ def add_cycle_nodes(dataset, ablation):
             # add cycle node
             cycle_node_feature = new_x_in_graph[cycle]
             cycle_node_feature = cycle_node_feature.mean(dim=0)
-            if ablation != 1:
+
+            if ablation == 0:
                 cycle_node_feature[-1] = float(cycle_size)
-            else:
+            elif ablation == 1:
                 cycle_node_feature[-1] = float(0)
+            elif ablation == 2:
+                print("ablation 2 is not supported")
+                exit(0)
+            elif ablation == 3:
+                pass
+            else:
+                print("ablation should be 0, 1, 2, or 3")
+                exit(0)
 
             # update x, batch
             new_x_in_graph = torch.cat([new_x_in_graph, cycle_node_feature.view(1, feature_size)], dim=0)
