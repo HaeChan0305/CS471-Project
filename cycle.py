@@ -23,7 +23,8 @@ def add_cycle_nodes(dataset, ablation):
     # nodes have one more feature
     if ablation != 3:
         x = torch.cat([x, torch.zeros(x.size(0), 1, device=original_device)], dim=1)  # One more feature
-        feature_size = x.size(1)
+
+    feature_size = x.size(1)
 
     # for dataset to return
     new_x = torch.tensor([], dtype=x.dtype, device=x.device).view(0, x.size(1))
