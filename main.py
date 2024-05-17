@@ -44,7 +44,8 @@ if torch.cuda.is_available():
     torch.cuda.manual_seed(args.seed)
     args.device = 'cuda:0'
 dataset = TUDataset(os.path.join('data',args.dataset),name=args.dataset)
-dataset = add_cycle_nodes(dataset, ablation) # added
+if ablation != 2:
+    dataset = add_cycle_nodes(dataset, ablation) # added
 
 args.num_classes = dataset.num_classes
 args.num_features = dataset.num_features
