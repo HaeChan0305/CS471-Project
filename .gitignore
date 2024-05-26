@@ -1,1 +1,4 @@
 *.pt
+*.pth
+.gitignore
+./__pycache__
