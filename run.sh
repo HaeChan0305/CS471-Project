@@ -6,15 +6,11 @@
 # python3 main.py --ablation 0
 # python3 main.py --ablation 1
 
-# for i in $(seq 3 3)
-# do
-#     for j in $(seq 1 30)
-#     do
-#         python3 main.py --dataset PROTEINS --ablation $i
-#     done
-# done
 
-for j in $(seq 1 30)
+for i in $(seq 0 3)
 do
-    python3 main.py --dataset PROTEINS --ablation 2
+    for j in $(seq 1 170)
+    do
+        python3 main.py --ablation $i
+    done
 done

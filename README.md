@@ -1,28 +1,6 @@
-Pytorch implementation of Self-Attention Graph Pooling
-====
+# Augmentation of Graph Representations with Cycles
+This is the final project for Professor [Joyce Jiyoung Whang](https://bdi-lab.kaist.ac.kr/)'s course, **CS471: Graph Machine Learning and Mining**, in **KAIST**.
 
-PyTorch implementation of [Self-Attention Graph Pooling](https://arxiv.org/abs/1904.08082)
-
-![SAGPool](figure.png)
-
-
-## Requirements
-
-  * torch_geometric
-  * torch
-
-## Usage
-
-```python main.py```
-
-
-## Cite
-```
-@InProceedings{pmlr-v97-lee19c,
-  title = 	 {Self-Attention Graph Pooling},
-  author = 	 {Lee, Junhyun and Lee, Inyeop and Kang, Jaewoo},
-  booktitle = 	 {Proceedings of the 36th International Conference on Machine Learning},
-  year = 	 {2019},
-  month = 	 {09--15 Jun}
-}
-```
+<p align="center">
+  <img src="images/poster.png" width="90%" alt="Figure">
+</p>
