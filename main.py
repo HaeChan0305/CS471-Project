@@ -35,10 +35,21 @@ parser.add_argument('--patience', type=int, default=50,
                     help='patience for earlystopping')
 parser.add_argument('--pooling_layer_type', type=str, default='GCNConv',
                     help='DD/PROTEINS/NCI1/NCI109/Mutagenicity')
-parser.add_argument('--ablation', type=int, default=0)
+parser.add_argument('--experiment', type=int)
 
 args = parser.parse_args()
-ablation = args.ablation
+experiment = args.experiment
+if experiment == 1:
+    ablation = 2
+elif experiment == 2:
+    ablation = 1
+elif experiment == 3:
+    ablation = 0
+elif experiment == 4:
+    ablation = 3
+else:
+    print("Invalid experiment number")
+    exit()
 
 # device
 args.device = 'cpu'
